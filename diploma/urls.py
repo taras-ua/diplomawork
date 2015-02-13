@@ -1,3 +1,4 @@
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls import patterns, url
 # from django.contrib import admin
 
@@ -8,3 +9,5 @@ urlpatterns = patterns('',
 
     # url(r'^admin/', include(admin.site.urls)),
 )
+
+urlpatterns += staticfiles_urlpatterns()
