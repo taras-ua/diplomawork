@@ -6,14 +6,17 @@
 
     <link rel="shortcut icon" type="image/png" href="{{STATIC_URL}}/favicon.ico"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vis.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/graph.css">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vis.min.js"></script>
     <script src="{{ STATIC_URL }}js/graph.js"></script>
 </head>
 <body>
+    <div id="graph-canvas" class="col-xs-8 col-xs-offset-2 well">
+    </div>
     <script type="text/javascript">
         buildGraph({{ graph|safe }});
     </script>
