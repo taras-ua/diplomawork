@@ -2,19 +2,52 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
+    <title>Spectral graph theory</title>
+	<meta name="author" content="Taras Rogov" />
+	<meta name="description" content="B.Sys.An. diploma work on spectral graph theory by Taras Rogov
+	                                  and cand. of phys.-math. sc. Igor Spectorsky" />
+	<meta name="keywords"  content="Taras, Rogov, Тарас, Рогов, Igor, Spectorsky, Ігор, Якович, Спекторський,
+	                                Ukraine, Україна, NTUU, НТУУ, КПІ, КПИ,
+	                                graph theory, spectral graph theory, graph, system analysis" />
 
+    <link rel="shortcut icon" type="image/png" href="{{STATIC_URL}}/favicon.ico"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/home.css">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="{{ STATIC_URL }}js/validator.min.js"></script>
     <script src="{{ STATIC_URL }}js/home.js"></script>
 </head>
 <body>
-    <script type="text/javascript">
-        buildGraph({{ graph|safe }});
-    </script>
+    <div class="content-holder well col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <form class="form-horizontal" data-toggle="validator" role="form" method="post">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="id_model">Model:</label>
+                <div class="col-sm-10">
+                    {{ form.model|add_class:"form-control"|attr:"required"|attr:"onchange:modelChanged()" }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="id_nodes">Nodes:</label>
+                <div class="col-sm-10">
+                    {{ form.nodes|add_class:"form-control"|attr:"required" }}
+                </div>
+            </div>
+            <div class="form-group" id="subnodes-group">
+                <label class="control-label col-sm-2" for="id_nodes">Subnodes:</label>
+                <div class="col-sm-10">
+                    {{ form.subnodes|add_class:"form-control"|attr:"required" }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

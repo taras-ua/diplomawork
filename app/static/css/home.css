@@ -1,9 +1,17 @@
-.node {
-    stroke: #fff;
-    stroke-width: 1.5px;
+html {
+  background: url(/static/graph_background.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
-.link {
-    stroke: #999;
-    stroke-opacity: .6;
+.content-holder {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.form-group:first-of-type {
+    margin-top: 15px;
 }
