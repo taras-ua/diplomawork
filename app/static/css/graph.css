@@ -7,9 +7,12 @@ html {
 }
 
 #graph-canvas {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     height: 500px;
     padding: 0;
+    margin: 25px 0;
+}
+
+#graph-data p {
+    font-size: 10pt;
+    font-family: monospace;
 }

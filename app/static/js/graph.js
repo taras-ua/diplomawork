@@ -1,9 +1,12 @@
-function buildGraph(graph) {
+function buildGraph(nodes, edges) {
     var container = document.getElementById('graph-canvas');
     var paths = '';
-    for(var i = 0; i < graph.links.length; i++) {
-        paths += graph.links[i].source + ' -> ' + graph.links[i].target;
-        if(i != graph.links.length - 1) {
+    for(i = 0; i < nodes.length; i++) {
+        paths += nodes[i].id + '; ';
+    }
+    for(i = 0; i < edges.length; i++) {
+        paths += edges[i].source + ' -> ' + edges[i].target;
+        if(i != edges.length - 1) {
             paths += '; ';
         }
     }

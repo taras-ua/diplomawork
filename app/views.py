@@ -7,10 +7,11 @@ import app.controllers.main as controller
 
 
 class GraphForm(forms.Form):
-    MODEL_CHOICES = (('simple', 'Simple random graph',), ('bollobas-riordan', 'Bollobás–Riordan model',))
+    MODEL_CHOICES = (('simple', 'Simple random directed multigraph',), ('bollobas-riordan', 'Bollobás–Riordan model',))
     model = forms.ChoiceField(widget=forms.Select, choices=MODEL_CHOICES)
     nodes = forms.IntegerField(min_value=0)
-    subnodes = forms.IntegerField(min_value=0)
+    subnodes = forms.IntegerField(min_value=0, required=False)
+    probability = forms.FloatField(min_value=0, max_value=1, required=False)
 
 
 def home(request):
@@ -26,5 +27,8 @@ def home(request):
 
 
 def graph(request):
-    graph_json = controller.get_graph(request)
-    return render_to_response('graph.html', {'graph': graph_json}, context_instance=RequestContext(request))
+    graph_json, matrix, eig = controller.get_graph(request)
+    return render_to_response('graph.html', {'nodes': graph_json['nodes'],
+                                             'edges': graph_json['links'],
+                                             'matrix': matrix, 'eigenvalues': eig},
+                              context_instance=RequestContext(request))
