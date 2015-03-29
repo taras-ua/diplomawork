@@ -2,12 +2,11 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.http import HttpResponse
 from django import forms
-
 import app.controllers.main as controller
 
 
 class GraphForm(forms.Form):
-    MODEL_CHOICES = (('simple', 'Simple random directed multigraph',), ('bollobas-riordan', 'Bollobás–Riordan model',))
+    MODEL_CHOICES = (('simple', 'Simple random directed multigraph',), ('bollobas-riordan', 'Bollobás–Riordan model',), ('new-model', 'New Model',))
     model = forms.ChoiceField(widget=forms.Select, choices=MODEL_CHOICES)
     nodes = forms.IntegerField(min_value=0)
     subnodes = forms.IntegerField(min_value=0, required=False)

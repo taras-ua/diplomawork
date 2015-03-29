@@ -2,9 +2,9 @@ import networkx as nx
 from networkx.readwrite import json_graph
 import numpy as np
 from numpy import linalg as la
-
 import app.controllers.bollobasriordan as br
 import app.controllers.simplemodel as sm
+import app.controllers.newmodel as nm
 
 
 def build_request(form):
@@ -12,7 +12,7 @@ def build_request(form):
     model = form.cleaned_data['model']
     request += 'model=' + model
     request += '&nodes={}'.format(form.cleaned_data['nodes'])
-    if model == 'bollobas-riordan':
+    if model == 'bollobas-riordan' or model == 'new-model':
         request += '&subnodes={}'.format(form.cleaned_data['subnodes'])
     elif model == 'simple':
         request += '&probability={}'.format(form.cleaned_data['probability'])
@@ -29,6 +29,9 @@ def get_graph(request):
     elif model == 'simple':
         probability = float(request.GET.get('probability'))
         graph = sm.SimpleRandomGraph(nodes, probability).get_nx_graph()
+    elif model == 'new-model':
+        subnodes = int(request.GET.get('subnodes'))
+        graph = nm.NewModel(nodes, subnodes).get_nx_graph()
     if graph is not None:
         matrix = nx.to_numpy_matrix(graph)
         np.set_printoptions(suppress=True, precision=5)
