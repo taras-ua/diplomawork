@@ -20,9 +20,10 @@
     <script src="{{ STATIC_URL }}js/home.js"></script>
 </head>
 <body>
+    <h1>Probabilistic specifications of common web-graph models</h1>
     <div class="content-holder well col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
         <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-            <h1>Graph Building Tool</h1>
+            <h2>Graph Building Tool</h2>
             <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/graph/">
                 {% csrf_token %}
                 {% load widget_tweaks %}
@@ -59,7 +60,7 @@
             </form>
         </div>
         <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-            <h1>New Model Specs</h1>
+            <h2>New Model Specs</h2>
             <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/probabilities/">
                 {% csrf_token %}
                 {% load widget_tweaks %}
@@ -99,10 +100,10 @@
     <div id="authors">
         <div class="col-md-6 text-right">
             <span id="name-is" class="well">Cand.ph.-m.sc. Igor Spectorsky</span>
-            <a href="http://spectorsky.ho.ua/"><img src="/static/spektorskyi.jpg" class="author scale"></a>
+            <a href="http://spectorsky.ho.ua/" target="_blank"><img src="/static/spektorskyi.jpg" class="author scale well"></a>
         </div>
         <div class="col-md-6 text-left">
-            <a href="http://taras.codes/"><img src="/static/rogov.jpg" class="author scale"></a>
+            <a href="http://taras.codes/" target="_blank"><img src="/static/rogov.jpg" class="author scale well"></a>
             <span id="name-tr" class="well">B.sys.an. student Taras Rogov</span>
         </div>
     </div>
