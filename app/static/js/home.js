@@ -5,7 +5,7 @@ function modelChanged() {
     var model = ddlModel.options[ddlModel.selectedIndex].value;
     var numSubnodes = document.getElementById("id_subnodes");
     var numProbability = document.getElementById("id_probability");
-    if(model == 'bollobas-riordan') {
+    if(model == 'bollobas-riordan' || model == 'new-model') {
         $('#subnodes-group').show(ANIMATION_SPEED);
         numSubnodes.required = true;
     } else {
@@ -21,6 +21,24 @@ function modelChanged() {
     }
 }
 
+function probabilityChanged() {
+    var ddlProb = document.getElementById("id_spec");
+    var prob = ddlProb.options[ddlProb.selectedIndex].value;
+    var degreeVal = document.getElementById("id_degree");
+    if(prob == 'degree') {
+        $('#degree-group').show(ANIMATION_SPEED);
+        degreeVal.required = true;
+    } else {
+        $('#degree-group').hide(ANIMATION_SPEED);
+        degreeVal.required = false;
+    }
+}
+
+function launchSpinner(id) {
+    $('#'+id).show();
+}
+
 $(function() {
-   modelChanged();
+    modelChanged();
+    probabilityChanged();
 });

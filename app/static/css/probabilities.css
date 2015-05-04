@@ -6,21 +6,20 @@ body {
   background-size: cover;
 }
 
-#graph-canvas {
+#plot-canvas {
     height: 500px;
     padding: 0;
-    background: url(/static/tile-pattern.jpg) repeat;
 }
 
-#graph-input {
+#plot-input {
     margin-top: 25px;
 }
 
-#graph-input h3 {
+#plot-input h3 {
     margin-top: 10px;
 }
 
-#graph-data p {
+#plot-data p {
     font-size: 10pt;
     font-family: monospace;
 }

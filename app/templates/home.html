@@ -2,58 +2,109 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Spectral graph theory</title>
+    <title>Probabilistic specifications of common web-graph models</title>
 	<meta name="author" content="Taras Rogov" />
 	<meta name="description" content="B.Sys.An. diploma work on spectral graph theory by Taras Rogov
 	                                  and cand. of phys.-math. sc. Igor Spectorsky" />
 	<meta name="keywords"  content="Taras, Rogov, Тарас, Рогов, Igor, Spectorsky, Ігор, Якович, Спекторський,
-	                                Ukraine, Україна, NTUU, НТУУ, КПІ, КПИ,
-	                                graph theory, spectral graph theory, graph, system analysis" />
+	                                Ukraine, Україна, NTUU, НТУУ, КПІ, КПИ, probability,
+	                                graph theory, probabilistic specifications, web-graph, graph, system analysis" />
 
-    <link rel="shortcut icon" type="image/png" href="{{STATIC_URL}}/favicon.ico"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}favicon.ico"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/home.css">
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/jquery-1.11.2.min.js"></script>
+    <script src="{{ STATIC_URL }}js/vendor/bootstrap.min.js"></script>
     <script src="{{ STATIC_URL }}js/validator.min.js"></script>
     <script src="{{ STATIC_URL }}js/home.js"></script>
 </head>
 <body>
-    <div class="content-holder well col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-        <form class="form-horizontal" data-toggle="validator" role="form" method="post">
-            {% csrf_token %}
-            {% load widget_tweaks %}
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="id_model">Model:</label>
-                <div class="col-sm-9">
-                    {{ form.model|add_class:"form-control"|attr:"required"|attr:"onchange:modelChanged()" }}
+    <div class="content-holder well col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+        <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+            <h1>Graph Building Tool</h1>
+            <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/graph/">
+                {% csrf_token %}
+                {% load widget_tweaks %}
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="id_model">Model:</label>
+                    <div class="col-sm-9">
+                        {{ gform.model|add_class:"form-control"|attr:"required"|attr:"onchange:modelChanged()" }}
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="id_nodes">Nodes:</label>
-                <div class="col-sm-9">
-                    {{ form.nodes|add_class:"form-control"|attr:"required" }}
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="id_nodes">Nodes:</label>
+                    <div class="col-sm-9">
+                        {{ gform.nodes|add_class:"form-control"|attr:"required" }}
+                    </div>
                 </div>
-            </div>
-            <div class="form-group" id="subnodes-group">
-                <label class="control-label col-sm-3" for="id_nodes">Subnodes:</label>
-                <div class="col-sm-9">
-                    {{ form.subnodes|add_class:"form-control"|attr:"required" }}
+                <div class="form-group" id="subnodes-group">
+                    <label class="control-label col-sm-3" for="id_nodes">Subnodes:</label>
+                    <div class="col-sm-9">
+                        {{ gform.subnodes|add_class:"form-control"|attr:"required" }}
+                    </div>
                 </div>
-            </div>
-            <div class="form-group" id="probability-group" style="display: none;">
-                <label class="control-label col-sm-3" for="id_probability">Edge probability:</label>
-                <div class="col-sm-9">
-                    {{ form.probability|add_class:"form-control" }}
+                <div class="form-group" id="probability-group" style="display: none;">
+                    <label class="control-label col-sm-3" for="id_probability">Probability:</label>
+                    <div class="col-sm-9">
+                        {{ gform.probability|add_class:"form-control" }}
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-9">
-                    <button type="submit" class="btn btn-default">Submit</button>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-default" onclick="launchSpinner('build')">Build</button>
+                        <img src="/static/spinner.gif" id="build" class="spinner"/>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+            <h1>New Model Specs</h1>
+            <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/probabilities/">
+                {% csrf_token %}
+                {% load widget_tweaks %}
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="id_spec">Spec:</label>
+                    <div class="col-sm-9">
+                        {{ pform.spec|add_class:"form-control"|attr:"required"|attr:"onchange:probabilityChanged()" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="id_edges">Edges:</label>
+                    <div class="col-sm-9">
+                        {{ pform.edges|add_class:"form-control"|attr:"required" }}
+                    </div>
+                </div>
+                <div class="form-group" id="degree-group" style="display: none;">
+                    <label class="control-label col-sm-3" for="id_degree">Degree:</label>
+                    <div class="col-sm-9">
+                        {{ pform.degree|add_class:"form-control"|attr:"required" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-3" for="id_time">Time:</label>
+                    <div class="col-sm-9">
+                        {{ pform.time|add_class:"form-control"|attr:"required" }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-default" onclick="launchSpinner('count')">Count</button>
+                        <img src="/static/spinner.gif" id="count" class="spinner"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="authors">
+        <div class="col-md-6 text-right">
+            <span id="name-is" class="well">Cand.ph.-m.sc. Igor Spectorsky</span>
+            <a href="http://spectorsky.ho.ua/"><img src="/static/spektorskyi.jpg" class="author scale"></a>
+        </div>
+        <div class="col-md-6 text-left">
+            <a href="http://taras.codes/"><img src="/static/rogov.jpg" class="author scale"></a>
+            <span id="name-tr" class="well">B.sys.an. student Taras Rogov</span>
+        </div>
     </div>
 </body>
 </html>

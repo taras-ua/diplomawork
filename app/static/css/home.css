@@ -1,16 +1,21 @@
-html {
-  background: url(/static/graph_background.png) no-repeat center center fixed;
+body {
+  background: #000 url(/static/graph_background.png) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
 
+h1 {
+    text-align: right;
+    font-size: 12pt;
+    text-transform: uppercase;
+}
+
 .content-holder {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    padding-right: 50px;
 }
 
 .btn {
@@ -21,10 +26,49 @@ html {
     margin-top: 15px;
 }
 
-@media screen and (max-width: 767px) {
+.spinner {
+    display: none;
+    height: 30px;
+}
 
-    .content-holder {
-        padding-right: 19px;
+#authors {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.author {
+    height: 100px;
+    width: 100px;
+    border-radius: 50px;
+    margin: 20px;
+}
+
+.scale {
+    -webkit-transition-duration: 0.8s;
+    -moz-transition-duration: 0.8s;
+    -o-transition-duration: 0.8s;
+    transition-duration: 0.8s;
+
+    -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -o-transition-property: -o-transform;
+    transition-property: transform;
+
+    overflow:hidden;
+}
+
+.scale:hover {
+    -webkit-transform: scale(1.2,1.2);
+    -moz-transform: scale(1.2,1.2);
+    -o-transform: scale(1.2,1.2);
+}
+
+@media (max-width:991px) {
+
+    #authors {
+        display: none;
     }
 
 }
