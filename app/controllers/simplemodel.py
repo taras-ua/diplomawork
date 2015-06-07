@@ -1,5 +1,4 @@
 import random
-
 import networkx as nx
 
 
@@ -14,11 +13,11 @@ class SimpleRandomGraph:
         return self.graph
 
     def simple_model(self):
-        G = nx.MultiDiGraph()
+        G = nx.Graph()
         for i in range(self.n):
             G.add_node(i)
         for i in range(self.n):
             for j in range(self.n):
-                if random.uniform(0, 1) < self.p:
+                if i != j and random.uniform(0, 1) <= self.p:
                     G.add_edge(i, j)
         return G

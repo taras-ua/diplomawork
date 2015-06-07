@@ -2,11 +2,9 @@ import json
 import networkx as nx
 from networkx.readwrite import json_graph
 import numpy as np
-from numpy import linalg as la
 import app.controllers.bollobasriordan as br
 import app.controllers.simplemodel as sm
 import app.controllers.newmodel as nm
-import app.controllers.probabilities as prob
 
 
 def build_graph_request(form):
@@ -16,19 +14,11 @@ def build_graph_request(form):
     request += '&nodes={}'.format(form.cleaned_data['nodes'])
     if model == 'bollobas-riordan' or model == 'new-model':
         request += '&subnodes={}'.format(form.cleaned_data['subnodes'])
-    elif model == 'simple':
+        request += '&initweight={}'.format(form.cleaned_data['initial_weight'])
+    if model == 'new-model':
+        request += '&forget={}'.format(form.cleaned_data['forget_coef'])
+    elif model == 'erdos-renyi':
         request += '&probability={}'.format(form.cleaned_data['probability'])
-    return request
-
-
-def build_probabilities_request(form):
-    request = '/probabilities/?'
-    spec = form.cleaned_data['spec']
-    request += 'spec=' + spec
-    request += '&edges={}'.format(form.cleaned_data['edges'])
-    if spec == 'degree':
-        request += '&degree={}'.format(form.cleaned_data['degree'])
-    request += '&time={}'.format(form.cleaned_data['time'])
     return request
 
 
@@ -37,58 +27,79 @@ def get_graph(request):
     nodes = int(request.GET.get('nodes'))
     graph = None
     model_name = ''
-    model_data = 'Nodes: ' + str(nodes)
+    model_data = 'n = ' + str(nodes)
+    directed = 1
+    subnodes_for_new_model = 0
     if model == 'bollobas-riordan':
         model_name = 'Bollobás–Riordan model'
         subnodes = int(request.GET.get('subnodes'))
-        model_data += ' | Subnodes: ' + str(subnodes)
-        graph = br.BollobasRiordan(nodes, subnodes).get_nx_graph()
-    elif model == 'simple':
-        model_name = 'Simple random directed multigraph'
+        initweight = float(request.GET.get('initweight'))
+        model_data += ' | m = ' + str(subnodes) + ' | &alpha; = ' + str(initweight)
+        graph = br.BollobasRiordan(nodes, subnodes, initweight).get_nx_graph()
+    elif model == 'erdos-renyi':
+        model_name = 'Erdős–Rényi model'
+        directed = 0
         probability = float(request.GET.get('probability'))
-        model_data += ' | Probability: ' + str(probability)
+        model_data += ' | p = ' + str(probability)
         graph = sm.SimpleRandomGraph(nodes, probability).get_nx_graph()
     elif model == 'new-model':
-        model_name = 'New Model'
+        model_name = 'Model of forgetting'
         subnodes = int(request.GET.get('subnodes'))
-        model_data += ' | Subnodes: ' + str(subnodes)
-        graph = nm.NewModel(nodes, subnodes).get_nx_graph()
+        subnodes_for_new_model = subnodes
+        initweight = float(request.GET.get('initweight'))
+        forget = float(request.GET.get('forget'))
+        model_data += ' | m = ' + str(subnodes) + ' | &alpha; = ' + str(initweight) + ' | &beta; = ' + str(forget)
+        graph = nm.NewModel(nodes, subnodes, initweight, forget).get_nx_graph()
     if graph is not None:
+        degrees, fractions = get_fraction_of_nodes_with_degree(graph)
+        degree_by_node = get_degrees_list(graph)
+        nodes = graph.number_of_nodes()
+        if model == 'new-model':
+            dead_nodes = 0
+            for node in graph.nodes():
+                if graph.degree(node) == 0:
+                    dead_nodes += 1
+            nodes -= dead_nodes
         matrix = nx.to_numpy_matrix(graph)
         np.set_printoptions(suppress=True, precision=5)
-        eigenvals, eigenvecs = la.eig(matrix)
-        eigenstring = ''
         matrix_string = ''
-        eig_num = 0
-        for i in range(eigenvals.size):
-            val = eigenvals[i]
-            matrix_string += str(matrix[i, :]).replace('[', '').replace(']', '') + '<br>'
-            if val != 0:
-                eig_num += 1
-                eigenstring += '<b>&lambda;<sub>' + str(eig_num) + '</sub></b> = ' + str(val) + '; '
-                eigenstring += '<b>f<sub>' + str(eig_num) + '</sub></b> = ( '
-                eigenstring += str(eigenvecs[:, i]).replace('[', '').replace(']', '')
-                eigenstring += ' )<sup>T</sup><br>'
-        return json_graph.node_link_data(graph), matrix_string, eigenstring, model_name, model_data
+        for i in range(len(matrix)):
+            matrix_string += str(matrix[i, :]).replace('[', '').replace(']', '').replace('\n ', '') + '\n'
+        return json_graph.node_link_data(graph), degrees, fractions, degree_by_node, matrix_string, model_name, model_data, directed, \
+               get_diam(graph, model), nodes, graph.number_of_edges(), subnodes_for_new_model
 
 
-def get_probabilities(request):
-    spec = request.GET.get('spec')
-    initial_edges_value = int(request.GET.get('edges'))
-    time_length = int(request.GET.get('time'))
-    x = None
-    y = None
-    spec_name = ''
-    spec_data = 'Initial edges: ' + str(initial_edges_value) + ' | Time period: ' + str(time_length)
-    main_init = initial_edges_value
-    if spec == 'edges':
-        spec_name = 'Total number of edges'
-        x, y = prob.edges(initial_edges_value, time_length)
-    if spec == 'degree':
-        initial_degree_value = int(request.GET.get('degree'))
-        main_init = initial_degree_value
-        spec_name = 'Degree of single node'
-        spec_data = 'Initial degree: ' + str(initial_degree_value) + ' | ' + spec_data
-        x, y = prob.degree(initial_edges_value, initial_degree_value, time_length)
-    if x is not None and y is not None:
-        return spec_name, spec_data, json.dumps(x.tolist()), json.dumps(y.tolist()), main_init
+def get_degrees_list(graph):
+    degrees = []
+    for node in range(graph.number_of_nodes()):
+        degrees += [graph.degree(node)]
+    return degrees
+
+
+def get_diam(graph, model):
+    diam_check_graph = graph.to_undirected()
+    if model == 'new-model':
+        for node in diam_check_graph.nodes():
+            if diam_check_graph.degree(node) == 0:
+                diam_check_graph.remove_node(node)
+    try:
+        diam = nx.diameter(diam_check_graph)
+    except nx.NetworkXError:
+        diam = '&infin;'
+    finally:
+        return diam
+
+def get_fraction_of_nodes_with_degree(graph: nx.MultiDiGraph):
+    degrees = {}
+    for node in graph.nodes():
+        current_degree = graph.degree(node)
+        if current_degree > 0:
+            if current_degree in degrees.keys():
+                temp = degrees.get(current_degree)
+                temp += [node]
+            else:
+                degrees.update({current_degree: [node]})
+    fractions = []
+    for d_value in sorted(degrees.keys()):
+        fractions += [len(degrees.get(d_value)) / graph.number_of_nodes()]
+    return sorted(degrees.keys()), fractions

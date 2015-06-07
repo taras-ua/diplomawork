@@ -12,6 +12,7 @@
 
     <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}favicon.ico"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap-theme.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/home.css">
 
     <script src="{{ STATIC_URL }}js/vendor/jquery-1.11.2.min.js"></script>
@@ -20,91 +21,67 @@
     <script src="{{ STATIC_URL }}js/home.js"></script>
 </head>
 <body>
-    <h1>Probabilistic specifications of common web-graph models</h1>
-    <div class="content-holder well col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-        <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-            <h2>Graph Building Tool</h2>
-            <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/graph/">
-                {% csrf_token %}
-                {% load widget_tweaks %}
-                <div class="form-group">
-                    <label class="control-label col-sm-3" for="id_model">Model:</label>
-                    <div class="col-sm-9">
-                        {{ gform.model|add_class:"form-control"|attr:"required"|attr:"onchange:modelChanged()" }}
-                    </div>
+    <div class="content-holder well col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+        <h2>Probabilistic specifications of common web-graph models</h2>
+        <form id="form-build" class="form-horizontal" data-toggle="validator" role="form" method="post" action="/graph/">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+            <div class="form-group">
+                <label class="control-label col-sm-3" for="id_model">Model</label>
+                <div class="col-sm-9">
+                    {{ gform.model|add_class:"form-control"|attr:"required"|attr:"onchange:modelChanged()" }}
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-3" for="id_nodes">Nodes:</label>
-                    <div class="col-sm-9">
-                        {{ gform.nodes|add_class:"form-control"|attr:"required" }}
-                    </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-3" for="id_nodes">n =</label>
+                <div class="col-sm-9">
+                    {{ gform.nodes|add_class:"form-control"|attr:"required" }}
                 </div>
-                <div class="form-group" id="subnodes-group">
-                    <label class="control-label col-sm-3" for="id_nodes">Subnodes:</label>
-                    <div class="col-sm-9">
-                        {{ gform.subnodes|add_class:"form-control"|attr:"required" }}
-                    </div>
+            </div>
+            <div class="form-group" id="subnodes-group">
+                <label class="control-label col-sm-3" for="id_nodes">m =</label>
+                <div class="col-sm-9">
+                    {{ gform.subnodes|add_class:"form-control"|attr:"required" }}
                 </div>
-                <div class="form-group" id="probability-group" style="display: none;">
-                    <label class="control-label col-sm-3" for="id_probability">Probability:</label>
-                    <div class="col-sm-9">
-                        {{ gform.probability|add_class:"form-control" }}
-                    </div>
+            </div>
+            <div class="form-group" id="initial_weight-group">
+                <label class="control-label col-sm-3" for="id_initial_weight">&alpha; =</label>
+                <div class="col-sm-9">
+                    {{ gform.initial_weight|add_class:"form-control"|attr:"required" }}
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button type="submit" class="btn btn-default" onclick="launchSpinner('build')">Build</button>
-                        <img src="/static/spinner.gif" id="build" class="spinner"/>
-                    </div>
+            </div>
+            <div class="form-group" id="forget_coef-group">
+                <label class="control-label col-sm-3" for="id_forget_coef">&beta; =</label>
+                <div class="col-sm-9">
+                    {{ gform.forget_coef|add_class:"form-control"|attr:"required" }}
                 </div>
-            </form>
-        </div>
-        <div class="col-md-6 col-md-offset-0 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-            <h2>New Model Specs</h2>
-            <form class="form-horizontal" data-toggle="validator" role="form" method="post" action="/probabilities/">
-                {% csrf_token %}
-                {% load widget_tweaks %}
-                <div class="form-group">
-                    <label class="control-label col-sm-3" for="id_spec">Spec:</label>
-                    <div class="col-sm-9">
-                        {{ pform.spec|add_class:"form-control"|attr:"required"|attr:"onchange:probabilityChanged()" }}
-                    </div>
+            </div>
+            <div class="form-group" id="probability-group" style="display: none;">
+                <label class="control-label col-sm-3" for="id_probability">p =</label>
+                <div class="col-sm-9">
+                    {{ gform.probability|add_class:"form-control" }}
                 </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-3" for="id_edges">Edges:</label>
-                    <div class="col-sm-9">
-                        {{ pform.edges|add_class:"form-control"|attr:"required" }}
-                    </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-default">Build</button>
+                    <img src="/static/spinner.gif" id="build" class="spinner"/>
                 </div>
-                <div class="form-group" id="degree-group" style="display: none;">
-                    <label class="control-label col-sm-3" for="id_degree">Degree:</label>
-                    <div class="col-sm-9">
-                        {{ pform.degree|add_class:"form-control"|attr:"required" }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-sm-3" for="id_time">Time:</label>
-                    <div class="col-sm-9">
-                        {{ pform.time|add_class:"form-control"|attr:"required" }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-9">
-                        <button type="submit" class="btn btn-default" onclick="launchSpinner('count')">Count</button>
-                        <img src="/static/spinner.gif" id="count" class="spinner"/>
-                    </div>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
     <div id="authors">
         <div class="col-md-6 text-right">
-            <span id="name-is" class="well">Cand.ph.-m.sc. Igor Spectorsky</span>
-            <a href="http://spectorsky.ho.ua/" target="_blank"><img src="/static/spektorskyi.jpg" class="author scale well"></a>
+            <span id="name-tr" class="well" style="opacity:0">B.S. student Taras Rogov</span>
+            <a href="http://taras.codes/" target="_blank">
+                <img id="img-tr" src="/static/rogov.jpg" class="author scale well">
+            </a>
         </div>
         <div class="col-md-6 text-left">
-            <a href="http://taras.codes/" target="_blank"><img src="/static/rogov.jpg" class="author scale well"></a>
-            <span id="name-tr" class="well">B.sys.an. student Taras Rogov</span>
+            <a href="http://spectorsky.ho.ua/" target="_blank">
+                <img id="img-is" src="/static/spektorskyi.jpg" class="author scale well">
+            </a>
+            <span id="name-is" class="well" style="opacity:0">Cand. Phys. Math. Sc. Igor Spectorsky</span>
         </div>
     </div>
 </body>

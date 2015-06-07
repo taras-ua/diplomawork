@@ -6,9 +6,21 @@ body {
   background-size: cover;
 }
 
-#graph-canvas {
+.canvas {
     height: 500px;
     padding: 0;
+    text-align: center;
+}
+
+.canvas button {
+    margin-top: 100px;
+}
+
+#degree-canvas {
+    background-color: #f5f5f5;
+}
+
+#graph-canvas {
     background: url(/static/tile-pattern.jpg) repeat;
 }
 
@@ -20,7 +32,14 @@ body {
     margin-top: 10px;
 }
 
-#graph-data p {
+#graph-matrix textarea {
     font-size: 10pt;
     font-family: monospace;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    width: 100%;
+    max-width: 100%;
+    height: 250px;
+    max-height: 500px;
+    background-color: #f5f5f5;
 }

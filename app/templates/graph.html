@@ -6,6 +6,7 @@
 
     <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}favicon.ico"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/bootstrap-theme.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/vis.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/graph.css">
 
@@ -19,15 +20,29 @@
         <h3>{{ model|safe }}</h3>
         <h4>{{ modeldata|safe }}</h4>
     </div>
-    <div id="graph-canvas" class="stripes col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well"></div>
-    <div id="graph-data" class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well">
+    <div id="graph-canvas" class="canvas col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well">
+        <button class="btn btn-default" onclick="buildGraph()">Show graph</button>
+    </div>
+    <div id="graph-output" class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well">
+        <h3>Graph specs:</h3>
+        <h4>Nodes: {{ nodesnumber|safe }}</h4>
+        <h4>Edges: {{ edgesnumber|safe }}</h4>
+        <h4>Diameter: {{ diameter|safe }}</h4>
+    </div>
+    <div id="graph-degree" class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well">
+        <h3>Degree distribution:</h3>
+        <p>Histogram represents graph data. Curve represents <i>c/d<sup>2.3</sup></i> distribution.</p>
+        <div id="degree-canvas" class="canvas col-xs-12 well">
+            <button class="btn btn-default" onclick="buildDistribution()">Show distribution</button>
+        </div>
+    </div>
+    <div id="graph-matrix" class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2 well">
         <h3>Adjacency matrix:</h3>
-        <p>{{ matrix|safe }}</p>
-        <h3>Eigenvalues:</h3>
-        <p>{{ eigenvalues|safe }}</p>
+        <textarea class="form-control" readonly wrap="off">{{ matrix|safe }}</textarea>
     </div>
     <script type="text/javascript">
-        buildGraph({{ nodes|safe }}, {{ edges|safe }});
+        saveGraph({{ nodes|safe }}, {{ edges|safe }}, {{ directed|safe }});
+        saveDistribution({{ degrees|safe }}, {{ fractions|safe }}, {{ degreebynode|safe }}, {{ subnodes|safe }});
     </script>
 </body>
 </html>
